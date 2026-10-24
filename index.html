@@ -1,173 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GATE EC 2027 tracker</title>
-<style>
-:root { --bg:#0c1116; --card:#161e27; --line:#2a3544; --text:#e8eef4; --muted:#8b9aab; --blue:#60a5fa; --green:#34d399; --amber:#fbbf24; --red:#f87171; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: var(--bg); color: var(--text); }
-header { position: sticky; top: 0; z-index: 20; background: #101820; border-bottom: 1px solid var(--line); padding: 12px 20px; }
-header h1 { margin: 0; font-size: 1.15rem; font-weight: 650; }
-header p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; }
-.bar { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 20px; background: #101820; border-bottom: 1px solid var(--line); }
-.bar button, .bar select, .bar input { background: transparent; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; }
-.bar button.active { background: var(--blue); border-color: var(--blue); color: #0c1116; }
-main { max-width: 980px; margin: 0 auto; padding: 16px; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 14px; }
-.stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
-.stat b { display: block; font-size: 1.35rem; }
-.stat span { color: var(--muted); font-size: 0.72rem; }
-.day, .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; }
-.day.head { border-color: var(--blue); }
-.day h2, .card h2 { margin: 0; padding: 12px 14px; font-size: 0.98rem; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; }
-.slot { padding: 10px 14px; border-bottom: 1px solid #1c2633; }
-.slot:last-child { border-bottom: none; }
-.slot .sub { color: var(--blue); font-size: 0.75rem; letter-spacing: 0.02em; }
-.slot .title { font-weight: 600; margin: 2px 0; }
-.slot .detail { color: var(--muted); font-size: 0.82rem; }
-.row { display: flex; gap: 8px; align-items: flex-start; margin-top: 6px; }
-label.chk { display: flex; gap: 6px; align-items: center; font-size: 0.8rem; color: var(--muted); cursor: pointer; }
-input[type=checkbox] { accent-color: var(--green); }
-input.rev { accent-color: var(--amber); }
-textarea, input.note { width: 100%; background: #0c1116; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; margin-top: 6px; }
-.tag { font-size: 0.7rem; padding: 1px 6px; border-radius: 99px; background: #243044; color: var(--muted); }
-.tag.y2027 { background: #3f2e12; color: var(--amber); }
-.phase { color: var(--muted); font-weight: 500; font-size: 0.78rem; }
-.note { background: #1a2433; border-left: 3px solid var(--amber); padding: 8px 12px; margin: 10px 14px; font-size: 0.82rem; color: #d5deea; }
-.hidden { display: none; }
-.bullet { padding: 8px 14px; border-bottom: 1px solid #1c2633; }
-.filters { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
-.prog { height: 4px; background: #243044; border-radius: 2px; margin: 6px 14px 10px; }
-.prog > div { height: 100%; background: var(--green); }
-</style>
-</head>
+<html>
+<head><meta charset="UTF-8"><title>Loading GATE EC 2027 tracker...</title></head>
 <body>
-<header>
-  <h1>GATE EC 2027 tracker</h1>
-  <p>24 Oct 2026 to 20 Dec 2026. Two ECE cores plus Maths or GA. Progress stays in this browser.</p>
-</header>
-<div class="bar">
-  <button class="active" data-tab="today">Today</button>
-  <button data-tab="plan">Day plan</button>
-  <button data-tab="subjects">Official bullets</button>
-  <button data-tab="lectures">PW lectures</button>
-  <button data-tab="revision">Needs revision</button>
-  <button data-tab="pyq">PYQ tracker</button>
-  <input id="q" placeholder="Search" />
-  <button id="export">Export</button>
-  <button id="import">Import</button>
-  <input id="file" type="file" accept="application/json" class="hidden" />
-</div>
-<main>
-  <div class="stats" id="stats"></div>
-  <div id="today" class="tab"></div>
-  <div id="plan" class="tab hidden"></div>
-  <div id="subjects" class="tab hidden"></div>
-  <div id="lectures" class="tab hidden"></div>
-  <div id="revision" class="tab hidden"></div>
-  <div id="pyq" class="tab hidden"></div>
-</main>
+<div id="status">Loading full tracker...</div>
 <script>
-let DATA;
-async function loadData() {
-  const parts = ['data_part0.js', 'data_part1.js', 'data_part2.js', 'data_part3.js'];
+async function load() {
+  const parts = ['part0.html', 'part1.html', 'part2.html', 'part3.html'];
   let full = '';
   for (const p of parts) {
-    const res = await fetch(p);
-    if (!res.ok) throw new Error('Failed to load ' + p);
-    full += await res.text();
+    const r = await fetch(p);
+    if (!r.ok) { document.getElementById('status').textContent = 'Failed to load ' + p; return; }
+    full += await r.text();
   }
-  eval(full);
-  startApp();
+  document.open();
+  document.write(full);
+  document.close();
 }
-function startApp() {
-function esc() {
-  return arguments.length ? "" : "";
-}
-
-function get(id) {return state[id] || {};}
-function set(id, obj) {state[id] = {...get(id), ...obj}; save(); render(); }
-function save() {localStorage.setItem("gate-ec-2027", JSON.stringify(state));}
-function load() {try {state = JSON.parse(localStorage.getItem("gate-ec-2027") || "{}"); } catch {state = {};} }
 load();
-
-function checks(id) {
-  const s = get(id);
-  return `<div class="row">
-    <label class="chk"><input type="checkbox" data-id="${id}" data-k="done" ${s.done ? "checked" : ""}> done</label>
-    <label class="chk"><input type="checkbox" class="rev" data-id="${id}" data-k="rev" ${s.rev ? "checked" : ""}> revision</label>
-    <input class="note" data-id="${id}" data-k="note" value="${esc(s.note||"")}" placeholder="note">
-  </div> `;
-}
-
-function renderPYQ() {
-  const el = document.getElementById("pyq");
-  if (!DATA.pyq) { el.innerHTML = "<div class='card'><div class='slot'>No PYQ data.</div></div>"; return; }
-  let html = "";
-  Object.entries(DATA.pyq).forEach(([sub, topics]) => {
-    html += `<div class="card"><h2>${sub} <span class="tag">${topics.length} topics</span></h2> `;
-    topics.forEach(t => {
-      const d = get(t.id);
-      const pct = t.count ? `@${d.done ? t.count : 0} / ${t.count} Q` : "";
-      html += `<div class="bullet">
-        <div class="sub">${t.title} ${pct}</div>
-        ${checks(t.id)}
-      </div> `;
-    });
-    html += "</div>";
-  });
-  el.innerHTML = html || '<div class="card"><div class="slot">No topics</div></div>';
-  // stats for PYQ
-  const all = Object.values(DATA.pyq).flat();
-  const done = all.filter(t => get(t.id).done).length;
-  // could add to stats div if needed
-}
-
-// stub for full render functions - actual file has them
-
-function render() {
-  stats();
-  const tab = document.querySelector(".bar button.active").dataset.tab;
-  renderToday(); renderPlan(); renderSubjects(); renderLectures(); renderRevision(); renderPYQ();
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("hidden", t.id !== tab));
-}
-
-document.querySelector(".bar").addEventListener("click", e => {
-  if (e.target.dataset.tab) {
-    document.querySelectorAll(".bar button").forEach(b => b.classList.remove("active"));
-    e.target.classList.add("active");
-    render();
-  }
-});
-document.getElementById("q").addEventListener("input", render);
-document.body.addEventListener("change", e => {
-  const id = e.target.dataset.id, k = e.target.dataset.k;
-  if (!id || !k) return;
-  if (k === "note") return;
-  set(id, {[k]: e.target.checked });
-});
-document.body.addEventListener("blur", e => {
-  const id = e.target.dataset.id, k = e.target.dataset.k;
-  if (id && k === "note") set(id, { note: e.target.value });
-}, true);
-document.getElementById("export").onclick = () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "gate-ec-2027-progress.json";
-  a.click();
-};
-document.getElementById("import").onclick = () => document.getElementById("file").click();
-document.getElementById("file").onchange = e => {
-  const f = e.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = () => { state = JSON.parse(r.result); save(); };
-  r.readAsText(f);
-};
-render();
 </script>
 </body>
 </html>
